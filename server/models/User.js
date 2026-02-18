@@ -29,14 +29,16 @@ const userSchema = new mongoose.Schema({
   reviewerStatus: {
     type: String,
     enum: ['PENDING', 'APPROVED', 'REJECTED'],
-    default: function() {
+    default: function () {
       return this.role === 'reviewer' ? 'PENDING' : 'APPROVED'; // Authors/Admins auto-approved/not-applicable
     }
   },
   createdAt: {
     type: Date,
     default: Date.now
-  }
+  },
+  resetPasswordToken: String,
+  resetPasswordExpire: Date
 });
 
 module.exports = mongoose.model('User', userSchema);

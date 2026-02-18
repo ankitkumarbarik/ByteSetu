@@ -1,106 +1,149 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap");
 @import "tailwindcss";
 
 @theme {
-  --color-border: hsl(var(--border));
-  --color-input: hsl(var(--input));
-  --color-ring: hsl(var(--ring));
-  --color-background: hsl(var(--background));
-  --color-foreground: hsl(var(--foreground));
+    /* Base Colors - Academic & Trustworthy */
+    /* Primary: Deep Royal Blue / Navy */
+    --color-primary: hsl(222.2 47.4% 11.2%);
+    --color-primary-foreground: hsl(210 40% 98%);
 
-  --color-primary: hsl(var(--primary));
-  --color-primary-foreground: hsl(var(--primary-foreground));
+    /* Secondary: Soft Slate / Gray Blue */
+    --color-secondary: hsl(210 40% 96.1%);
+    --color-secondary-foreground: hsl(222.2 47.4% 11.2%);
 
-  --color-secondary: hsl(var(--secondary));
-  --color-secondary-foreground: hsl(var(--secondary-foreground));
+    /* Accent: Vibrant Indigo/Purple for actions */
+    --color-accent: hsl(243 75% 59%);
+    --color-accent-foreground: hsl(210 40% 98%);
 
-  --color-destructive: hsl(var(--destructive));
-  --color-destructive-foreground: hsl(var(--destructive-foreground));
+    /* Semantic Colors */
+    --color-destructive: hsl(0 84.2% 60.2%);
+    --color-destructive-foreground: hsl(210 40% 98%);
 
-  --color-muted: hsl(var(--muted));
-  --color-muted-foreground: hsl(var(--muted-foreground));
+    --color-success: hsl(142 76% 36%);
+    --color-success-foreground: hsl(355.7 100% 97.3%);
 
-  --color-accent: hsl(var(--accent));
-  --color-accent-foreground: hsl(var(--accent-foreground));
+    --color-warning: hsl(48 96% 53%);
+    --color-warning-foreground: hsl(26 83% 14%);
 
-  --color-popover: hsl(var(--popover));
-  --color-popover-foreground: hsl(var(--popover-foreground));
+    /* Backgrounds & Surfaces */
+    --color-background: hsl(210 40% 98%);
+    --color-foreground: hsl(222.2 84% 4.9%);
 
-  --color-card: hsl(var(--card));
-  --color-card-foreground: hsl(var(--card-foreground));
+    --color-card: hsl(0 0% 100%);
+    --color-card-foreground: hsl(222.2 84% 4.9%);
 
-  --radius-lg: var(--radius);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-sm: calc(var(--radius) - 4px);
-  
-  --font-sans: 'Inter', system-ui, sans-serif;
+    --color-popover: hsl(0 0% 100%);
+    --color-popover-foreground: hsl(222.2 84% 4.9%);
+
+    --color-muted: hsl(210 40% 96.1%);
+    --color-muted-foreground: hsl(215.4 16.3% 46.9%);
+
+    /* Borders & Inputs */
+    --color-border: hsl(214.3 31.8% 91.4%);
+    --color-input: hsl(214.3 31.8% 91.4%);
+    --color-ring: hsl(243 75% 59%);
+
+    /* Radii */
+    --radius-lg: 0.75rem;
+    --radius-md: calc(0.75rem - 2px);
+    --radius-sm: calc(0.75rem - 4px);
+
+    /* Typography */
+    --font-sans: "Inter", system-ui, sans-serif;
+    --font-heading: "Montserrat", system-ui, sans-serif;
+    --font-serif: "Inter", system-ui, sans-serif;
+
+    /* Shadows - Premium Glass & Soft */
+    --shadow-glass: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
+    --shadow-soft: 0 4px 20px -2px rgba(0, 0, 0, 0.02);
+    --shadow-soft-lg: 0 10px 40px -3px rgba(0, 0, 0, 0.08);
+    --shadow-card-hover:
+        0 20px 25px -5px rgba(0, 0, 0, 0.1),
+        0 10px 10px -5px rgba(0, 0, 0, 0.04);
 }
 
 @layer base {
     :root {
-        --background: 0 0% 100%;
-        --foreground: 222.2 84% 4.9%; /* Slate-900 */
-        
+        /* Re-declaring variables for non-theme usage if needed, but Tailwind theme handles most */
+        --background: 210 40% 98%;
+        --foreground: 222.2 84% 4.9%;
+
         --card: 0 0% 100%;
         --card-foreground: 222.2 84% 4.9%;
-        
+
         --popover: 0 0% 100%;
         --popover-foreground: 222.2 84% 4.9%;
-        
-        /* Deep Navy Authority */
-        --primary: 222.2 47.4% 11.2%; 
+
+        --primary: 222.2 47.4% 11.2%;
         --primary-foreground: 210 40% 98%;
-        
-        /* Subtle Slate for secondary */
+
         --secondary: 210 40% 96.1%;
         --secondary-foreground: 222.2 47.4% 11.2%;
-        
+
         --muted: 210 40% 96.1%;
         --muted-foreground: 215.4 16.3% 46.9%;
-        
-        /* Bright Tech Blue Accent */
-        --accent: 217.2 91.2% 59.8%;
+
+        --accent: 243 75% 59%;
         --accent-foreground: 210 40% 98%;
-        
+
         --destructive: 0 84.2% 60.2%;
         --destructive-foreground: 210 40% 98%;
-        
+
         --border: 214.3 31.8% 91.4%;
         --input: 214.3 31.8% 91.4%;
-        --ring: 222.2 47.4% 11.2%; /* Ring matches Primary */
-        
-        --radius: 0.5rem;
+        --ring: 243 75% 59%;
+
+        --radius: 0.75rem;
     }
 
-    .dark {
-        --background: 222.2 84% 4.9%;
-        --foreground: 210 40% 98%;
-        --card: 222.2 84% 4.9%;
-        --card-foreground: 210 40% 98%;
-        --popover: 222.2 84% 4.9%;
-        --popover-foreground: 210 40% 98%;
-        --primary: 210 40% 98%;
-        --primary-foreground: 222.2 47.4% 11.2%;
-        --secondary: 217.2 32.6% 17.5%;
-        --secondary-foreground: 210 40% 98%;
-        --muted: 217.2 32.6% 17.5%;
-        --muted-foreground: 215 20.2% 65.1%;
-        --accent: 217.2 32.6% 17.5%;
-        --accent-foreground: 210 40% 98%;
-        --destructive: 0 62.8% 30.6%;
-        --destructive-foreground: 210 40% 98%;
-        --border: 217.2 32.6% 17.5%;
-        --input: 217.2 32.6% 17.5%;
-        --ring: 212.7 26.8% 83.9%;
-    }
-}
-
-@layer base {
     * {
         @apply border-border;
     }
+
     body {
-        @apply bg-background text-foreground font-sans;
-        font-family: 'Inter', sans-serif;
+        @apply bg-background text-foreground font-sans antialiased;
+        font-feature-settings:
+            "rlig" 1,
+            "calt" 1;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+        font-family: "Montserrat", sans-serif;
+        @apply tracking-tight font-semibold text-primary;
+    }
+}
+
+@layer utilities {
+    .glass-panel {
+        @apply bg-white/80 backdrop-blur-md border border-white/40 shadow-glass;
+    }
+
+    .glass-card {
+        @apply bg-white border border-border/50 shadow-soft hover:shadow-card-hover transition-all duration-300;
+    }
+
+    .text-gradient {
+        @apply bg-clip-text text-transparent bg-gradient-to-r from-primary to-accent;
+    }
+
+    .animate-enter {
+        @apply animate-[enter_0.5s_ease-out];
+    }
+}
+
+@keyframes enter {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
     }
 }

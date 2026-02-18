@@ -9,6 +9,9 @@ import Register from './pages/Register';
 import PublicSubmission from './pages/PublicSubmission';
 import LandingPage from './pages/LandingPage';
 import PublishedPapers from './pages/PublishedPapers';
+import ForgotPassword from './pages/ForgotPassword';
+import ResetPassword from './pages/ResetPassword';
+import PaperDetails from './pages/PaperDetails';
 
 // Protected Route Component
 const ProtectedRoute = ({ children, allowedRoles }) => {
@@ -32,40 +35,52 @@ function App() {
             <Route path="/published-papers" element={<PublishedPapers />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/reset-password/:resetToken" element={<ResetPassword />} />
             <Route path="/unauthorized" element={<Unauthorized />} />
 
             {/* Admin Routes */}
-            <Route 
-              path="/admin/*" 
+            <Route
+              path="/admin/*"
               element={
                 <ProtectedRoute allowedRoles={['admin']}>
                   <AdminDashboard />
                 </ProtectedRoute>
-              } 
+              }
             />
 
             {/* Reviewer Routes */}
-            <Route 
-              path="/reviewer/*" 
+            <Route
+              path="/reviewer/*"
               element={
                 <ProtectedRoute allowedRoles={['reviewer']}>
                   <ReviewerDashboard />
                 </ProtectedRoute>
-              } 
+              }
             />
 
             {/* Author Routes */}
-            <Route 
-              path="/author/*" 
+            <Route
+              path="/author/*"
               element={
-                 <ProtectedRoute allowedRoles={['author']}>
-                    <AuthorDashboard />
-                 </ProtectedRoute>
-              } 
+                <ProtectedRoute allowedRoles={['author']}>
+                  <AuthorDashboard />
+                </ProtectedRoute>
+              }
+            />
+
+            {/* Common Protected Routes */}
+            <Route
+              path="/paper/:id"
+              element={
+                <ProtectedRoute allowedRoles={['author', 'reviewer', 'admin']}>
+                  <PaperDetails />
+                </ProtectedRoute>
+              }
             />
 
             <Route path="/submit-paper" element={<PublicSubmission />} />
-            
+
             {/* Catch all - Redirect to Home */}
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
