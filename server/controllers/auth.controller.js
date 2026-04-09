@@ -79,16 +79,13 @@ exports.forgotPassword = async (req, res) => {
       return res.status(404).json({ message: 'User not found' });
     }
 
-    // Generate token
     const resetToken = crypto.randomBytes(20).toString('hex');
 
-    // Hash token and set to resetPasswordToken field
     user.resetPasswordToken = crypto
       .createHash('sha256')
       .update(resetToken)
       .digest('hex');
 
-    // Set expire time (10 minutes)
     user.resetPasswordExpire = Date.now() + 10 * 60 * 1000;
 
     await user.save();
@@ -138,7 +135,6 @@ exports.resetPassword = async (req, res) => {
       return res.status(400).json({ message: 'Invalid token' });
     }
 
-    // Set new password
     const salt = await bcrypt.genSalt(10);
     user.password = await bcrypt.hash(req.body.password, salt);
 
@@ -156,7 +152,7 @@ exports.resetPassword = async (req, res) => {
   }
 };
 
-exports.registerAdmin = async (req, res) => { // Internal use/Dev only usually
+exports.registerAdmin = async (req, res) => {
   try {
     const { name, email, password } = req.body;
     const existingUser = await User.findOne({ email });

@@ -7,7 +7,6 @@ require('dotenv').config();
 
 const app = express();
 
-// Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors({
@@ -17,12 +16,10 @@ app.use(cors({
 app.use(helmet());
 app.use(morgan('dev'));
 
-// Database Connection
 mongoose.connect(process.env.MONGODB_URI)
-  .then(() => console.log('✅ MongoDB Connected'))
-  .catch((err) => console.error('❌ MongoDB Connection Error:', err));
+  .then(() => console.log('MongoDB Connected'))
+  .catch((err) => console.error('MongoDB Connection Error:', err));
 
-// Routes
 const authRoutes = require('./routes/auth.routes');
 const paperRoutes = require('./routes/paper.routes');
 const userRoutes = require('./routes/user.routes');
@@ -43,5 +40,5 @@ app.use((err, req, res, next) => {
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT} - Updated Version`);
+  console.log(`Server running on port ${PORT} - Updated Version`);
 });

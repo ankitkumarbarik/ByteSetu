@@ -5,7 +5,6 @@ const sendEmail = require("../utils/sendEmail");
 const bcrypt = require("bcryptjs");
 const fs = require("fs");
 
-// Helper to Create Author if not exists
 const findOrCreateAuthor = async (name, email) => {
     let user = await User.findOne({ email });
     let password = null;
@@ -15,7 +14,7 @@ const findOrCreateAuthor = async (name, email) => {
         isNew = true;
         password =
             Math.random().toString(36).slice(-8) +
-            Math.random().toString(36).slice(-8); // Secure random password
+            Math.random().toString(36).slice(-8);
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
 
@@ -37,18 +36,15 @@ exports.submitPaper = async (req, res) => {
             return res.status(400).json({ message: "No file uploaded" });
         }
 
-        // 1. Upload to Cloudinary
         const result = await cloudinary.uploader.upload(req.file.path, {
-            resource_type: "raw", // Use 'raw' instead of 'auto' for PDFs
+            resource_type: "raw",
             folder: "research_papers",
             use_filename: true,
-            access_mode: "public", // Ensure public access
+            access_mode: "public",
         });
 
-        // Cleanup local file
         fs.unlinkSync(req.file.path);
 
-        // 2. Handle Author (Auto-create or Link)
         let authorId;
         if (req.user) {
             authorId = req.user.id;
@@ -88,10 +84,8 @@ exports.submitPaper = async (req, res) => {
                             "Failed to send welcome email:",
                             emailError,
                         );
-                        // Don't fail the whole request if email fails, but log it
                     }
                 } else {
-                    // Optionally send a "Submission Received" email even for existing users
                 }
             } catch (authError) {
                 console.error("Error in findOrCreateAuthor:", authError);
@@ -101,7 +95,6 @@ exports.submitPaper = async (req, res) => {
             }
         }
 
-        // 3. Create Paper
         const newPaper = new Paper({
             title,
             abstract,
@@ -140,10 +133,8 @@ exports.getAssignedPapers = async (req, res) => {
     try {
         const papers = await Paper.find({ "reviewers.reviewerId": req.user.id })
             .populate("authorId", "name")
-            .populate("reviewers.reviewerId", "name"); // useful to see others? maybe strict view later
+            .populate("reviewers.reviewerId", "name");
 
-        // Filter or just send all? The frontend needs to find *their* specific status.
-        // Let's send the paper object, frontend will find their entry in reviewers array.
         res.json(papers);
     } catch (error) {
         res.status(500).json({ error: error.message });
@@ -156,7 +147,6 @@ exports.assignReviewer = async (req, res) => {
         const paper = await Paper.findById(paperId);
         if (!paper) return res.status(404).json({ message: "Paper not found" });
 
-        // Check if already assigned
         const exists = paper.reviewers.some(
             (r) => r.reviewerId.toString() === reviewerId,
         );
@@ -174,7 +164,6 @@ exports.assignReviewer = async (req, res) => {
         paper.status = "UNDER_REVIEW";
         await paper.save();
 
-        // Notify Reviewer
         const reviewer = await User.findById(reviewerId);
         if (reviewer) {
             await sendEmail({
@@ -204,7 +193,6 @@ exports.submitReview = async (req, res) => {
                 .json({ message: "Cannot review a finalized paper" });
         }
 
-        // Find specific reviewer entry using robust comparison
         const reviewEntry = paper.reviewers.find(
             (r) =>
                 (r.reviewerId._id &&
@@ -241,7 +229,7 @@ exports.getMyPapers = async (req, res) => {
 
 exports.finalDecision = async (req, res) => {
     try {
-        const { paperId, decision } = req.body; // PUBLISH or REJECT
+        const { paperId, decision } = req.body;
         const paper = await Paper.findById(paperId);
         if (!paper) return res.status(404).json({ message: "Paper not found" });
 
@@ -256,7 +244,6 @@ exports.finalDecision = async (req, res) => {
 
         await paper.save();
 
-        // Notify Author
         const author = await User.findById(paper.authorId);
         await sendEmail({
             email: author.email,
@@ -277,15 +264,10 @@ exports.removeReviewer = async (req, res) => {
         const paper = await Paper.findById(paperId);
         if (!paper) return res.status(404).json({ message: "Paper not found" });
 
-        // Remove from array
         paper.reviewers = paper.reviewers.filter(
             (r) => r.reviewerId.toString() !== reviewerId,
         );
 
-        // If no reviewers left, maybe revert status?
-        // Let's keep it simple. If valid reviewer removed, they are gone.
-        // If all reviewers gone, status might ideally go back to SUBMITTED but 'assign' sets it to UNDER_REVIEW.
-        // Let's check length.
         if (paper.reviewers.length === 0 && paper.status === "UNDER_REVIEW") {
             paper.status = "SUBMITTED";
         }
@@ -299,15 +281,14 @@ exports.removeReviewer = async (req, res) => {
 exports.getPublishedPapers = async (req, res) => {
     try {
         const papers = await Paper.find({ status: "PUBLISHED" })
-            .populate("authorId", "name") // Only need name
-            .select("title abstract cloudinaryUrl publishedAt authorId"); // Select relevant fields
+            .populate("authorId", "name")
+            .select("title abstract cloudinaryUrl publishedAt authorId");
         res.json(papers);
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
 };
 
-// Stream PDF through server to bypass Cloudinary authentication
 exports.getPdfUrl = async (req, res) => {
     try {
         const { paperId } = req.params;
@@ -317,10 +298,8 @@ exports.getPdfUrl = async (req, res) => {
             return res.status(404).json({ message: "Paper not found" });
         }
 
-        // Generate a signed URL using cloudinary.url with proper signature
         const publicId = paper.cloudinaryPublicId;
 
-        // Generate signed URL with all necessary parameters
         const signedUrl = cloudinary.url(publicId + ".pdf", {
             resource_type: "image",
             type: "upload",
@@ -335,7 +314,6 @@ exports.getPdfUrl = async (req, res) => {
     }
 };
 
-// Server-side PDF redirect - redirects to stored Cloudinary URL
 exports.streamPdf = async (req, res) => {
     try {
         const { paperId } = req.params;
@@ -345,8 +323,6 @@ exports.streamPdf = async (req, res) => {
             return res.status(404).send("Paper not found");
         }
 
-        // Simply redirect to the stored cloudinaryUrl
-        // New uploads use resource_type: 'raw' which works with direct URLs
         res.redirect(paper.cloudinaryUrl);
     } catch (error) {
         console.error("Error redirecting to PDF:", error);
@@ -354,7 +330,6 @@ exports.streamPdf = async (req, res) => {
     }
 };
 
-// Get single paper by ID
 exports.getPaperById = async (req, res) => {
     try {
         const paper = await Paper.findById(req.params.id)
@@ -365,17 +340,6 @@ exports.getPaperById = async (req, res) => {
             return res.status(404).json({ message: "Paper not found" });
         }
 
-        // Access Control Check (Optional but recommended)
-        // If user is logged in, we can check roles.
-        // Admins can see all.
-        // Authors can see their own.
-        // Reviewers can see papers they are assigned to.
-
-        // For simplicity and to match the 'generic' Get Paper endpoint needed:
-        // We will return the paper. The frontend ProtectedRoute ensures they are at least logged in.
-        // Tighter security would check req.user vs paper.authorId etc.
-
-        // Let's implement a basic check if req.user is present (which it should be via verifyToken)
         if (req.user) {
             const isAdmin = req.user.role === "admin";
             const isAuthor = paper.authorId._id.toString() === req.user.id;
@@ -384,9 +348,6 @@ exports.getPaperById = async (req, res) => {
             );
 
             if (!isAdmin && !isAuthor && !isReviewer) {
-                // Return limited info or 403?
-                // For now, let's allow it but maybe limit sensitive info if we were strict.
-                // But actually, if a user clicks a link to a paper they shouldn't see, 403 is better.
                 return res
                     .status(403)
                     .json({ message: "Unauthorized to view this paper" });
@@ -404,7 +365,6 @@ exports.deletePaper = async (req, res) => {
         const paper = await Paper.findById(req.params.id);
         if (!paper) return res.status(404).json({ message: "Paper not found" });
 
-        // Delete from Cloudinary
         if (paper.cloudinaryPublicId) {
             try {
                 await cloudinary.uploader.destroy(paper.cloudinaryPublicId);

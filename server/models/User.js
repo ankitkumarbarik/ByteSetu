@@ -23,14 +23,14 @@ const userSchema = new mongoose.Schema({
     default: 'author'
   },
   qualifications: {
-    type: String, // Specific to reviewers
+    type: String,
     default: ''
   },
   reviewerStatus: {
     type: String,
     enum: ['PENDING', 'APPROVED', 'REJECTED'],
     default: function () {
-      return this.role === 'reviewer' ? 'PENDING' : 'APPROVED'; // Authors/Admins auto-approved/not-applicable
+      return this.role === 'reviewer' ? 'PENDING' : 'APPROVED';
     }
   },
   createdAt: {

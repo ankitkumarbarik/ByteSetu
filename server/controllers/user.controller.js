@@ -27,7 +27,7 @@ exports.getAllReviewers = async (req, res) => {
 
 exports.handleReviewerStatus = async (req, res) => {
     try {
-        const { userId, status } = req.body; // APPROVED or REJECTED
+        const { userId, status } = req.body;
         const user = await User.findById(userId);
         if (!user || user.role !== "reviewer") {
             return res.status(404).json({ message: "Reviewer not found" });
@@ -36,7 +36,6 @@ exports.handleReviewerStatus = async (req, res) => {
         user.reviewerStatus = status;
         await user.save();
 
-        // Email notification
         await sendEmail({
             email: user.email,
             subject: `Reviewer Application ${status}`,
